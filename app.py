@@ -45,8 +45,11 @@ if st.button('Predict'):
         st.write("Prediction shape:", prediction.shape)
         st.write("Prediction output:", prediction)
         
-        # Display results if prediction has the correct shape
-        if prediction.ndim == 2 and prediction.shape[1] == 10:  # Ensure it's a 2D array with 10 outputs
+        # If the prediction is a 1D array, assume it's a single value
+        if prediction.ndim == 1:
+            st.write(f"Predicted Biocrude Oil Yield: {prediction[0]:.2f}")
+        # If the prediction is a 2D array with 10 outputs, display them
+        elif prediction.ndim == 2 and prediction.shape[1] == 10:
             st.subheader("Predicted Biocrude Properties:")
             st.write(f"Biocrude Oil Yield (%): {prediction[0][0]:.2f}")
             st.write(f"Aqueous Phase Yield (%): {prediction[0][1]:.2f}")
