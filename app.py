@@ -38,7 +38,7 @@ def create_streamlit_ui():
     st.title("HTL Prediction for Biocrude Oil")
 
     # Biomass Composition Inputs
-    biomass_type = st.text_input("Biomass Type", "Enter biomass type (e.g., Wood, Algae, Waste)")  # Text input for biomass type
+    biomass_type = st.text_input("Biomass Type", "Enter biomass type (e.g.,Pinus leaves, Cupressus funebris leaves, Platanus leaves, Cinnamomum camphora leaves)")  # Text input for biomass type
     C_wt = st.number_input("C (wt%)", min_value=0.0, max_value=100.0, value=50.0)
     H_wt = st.number_input("H (wt%)", min_value=0.0, max_value=100.0, value=6.0)
     N_wt = st.number_input("N (wt%)", min_value=0.0, max_value=100.0, value=2.0)
