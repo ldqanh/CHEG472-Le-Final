@@ -5,7 +5,7 @@ import joblib  # To load saved models
 # Load your model (assumed to be saved as 'htl_model.pkl')
 def load_model():
     try:
-        model = joblib.load('htl_model.pkl')  # Adjust the path if needed
+        model = joblib.load('best_model.pkl')  # Adjust the path if needed
         return model
     except Exception as e:
         st.error(f"Failed to load model: {str(e)}")
