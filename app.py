@@ -1,9 +1,15 @@
 import streamlit as st
 import numpy as np
-from tensorflow.keras.models import load_model
+import joblib  # To load saved models
 
-# Load the trained model
-model = load_model('best_model.pkl')
+# Load your model 
+def load_model():
+    try:
+        model = joblib.load('best_model.pkl')  
+        return model
+    except Exception as e:
+        st.error(f"Failed to load model: {str(e)}")
+        return None
 
 # Biomass Composition Inputs
 biomass_type = st.text_input("Biomass Type")
