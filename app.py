@@ -2,14 +2,21 @@ import streamlit as st
 import numpy as np
 import joblib  # To load saved models
 
-# Load your model 
+# Load the model once at the start of the app
 def load_model():
     try:
-        model = joblib.load('best_model.pkl')  
+        model = joblib.load('best_model.pkl')  # Update this path as needed
         return model
     except Exception as e:
         st.error(f"Failed to load model: {str(e)}")
         return None
+
+# Load the model at the start of the app
+model = load_model()
+
+# Check if the model is loaded successfully
+if model is None:
+    st.error("Model not loaded. Please check the file path and try again.")
 
 # Biomass Composition Inputs
 biomass_type = st.text_input("Biomass Type")
@@ -31,17 +38,20 @@ input_data = np.array([C_wt, H_wt, N_wt, O_wt, S_wt, ash, operating_dry_matter, 
 
 # Predict the outputs
 if st.button('Predict'):
-    prediction = model.predict(input_data)
-    
-    # Display results
-    st.subheader("Predicted Biocrude Properties:")
-    st.write(f"Biocrude Oil Yield (%): {prediction[0][0]:.2f}")
-    st.write(f"Aqueous Phase Yield (%): {prediction[0][1]:.2f}")
-    st.write(f"Syngas Yield (%): {prediction[0][2]:.2f}")
-    st.write(f"Hydrochar Yield (%): {prediction[0][3]:.2f}")
-    st.write(f"Biocrude Carbon Content (wt%): {prediction[0][4]:.2f}")
-    st.write(f"Biocrude Hydrogen Content (wt%): {prediction[0][5]:.2f}")
-    st.write(f"Biocrude Nitrogen Content (wt%): {prediction[0][6]:.2f}")
-    st.write(f"Biocrude Oxygen Content (wt%): {prediction[0][7]:.2f}")
-    st.write(f"Biocrude Sulfur Content (wt%): {prediction[0][8]:.2f}")
-    st.write(f"Biocrude Calorific Value (MJ/kg): {prediction[0][9]:.2f}")
+    if model is not None:  # Ensure model is loaded before making prediction
+        prediction = model.predict(input_data)
+        
+        # Display results
+        st.subheader("Predicted Biocrude Properties:")
+        st.write(f"Biocrude Oil Yield (%): {prediction[0][0]:.2f}")
+        st.write(f"Aqueous Phase Yield (%): {prediction[0][1]:.2f}")
+        st.write(f"Syngas Yield (%): {prediction[0][2]:.2f}")
+        st.write(f"Hydrochar Yield (%): {prediction[0][3]:.2f}")
+        st.write(f"Biocrude Carbon Content (wt%): {prediction[0][4]:.2f}")
+        st.write(f"Biocrude Hydrogen Content (wt%): {prediction[0][5]:.2f}")
+        st.write(f"Biocrude Nitrogen Content (wt%): {prediction[0][6]:.2f}")
+        st.write(f"Biocrude Oxygen Content (wt%): {prediction[0][7]:.2f}")
+        st.write(f"Biocrude Sulfur Content (wt%): {prediction[0][8]:.2f}")
+        st.write(f"Biocrude Calorific Value (MJ/kg): {prediction[0][9]:.2f}")
+    else:
+        st.error("Model is not loaded. Please check the model file.")
