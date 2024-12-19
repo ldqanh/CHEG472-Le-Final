@@ -41,17 +41,24 @@ if st.button('Predict'):
     if model is not None:  # Ensure model is loaded before making prediction
         prediction = model.predict(input_data)
         
-        # Display results
-        st.subheader("Predicted Biocrude Properties:")
-        st.write(f"Biocrude Oil Yield (%): {prediction[0][0]:.2f}")
-        st.write(f"Aqueous Phase Yield (%): {prediction[0][1]:.2f}")
-        st.write(f"Syngas Yield (%): {prediction[0][2]:.2f}")
-        st.write(f"Hydrochar Yield (%): {prediction[0][3]:.2f}")
-        st.write(f"Biocrude Carbon Content (wt%): {prediction[0][4]:.2f}")
-        st.write(f"Biocrude Hydrogen Content (wt%): {prediction[0][5]:.2f}")
-        st.write(f"Biocrude Nitrogen Content (wt%): {prediction[0][6]:.2f}")
-        st.write(f"Biocrude Oxygen Content (wt%): {prediction[0][7]:.2f}")
-        st.write(f"Biocrude Sulfur Content (wt%): {prediction[0][8]:.2f}")
-        st.write(f"Biocrude Calorific Value (MJ/kg): {prediction[0][9]:.2f}")
+        # Debugging: Print out the shape and value of the prediction
+        st.write("Prediction shape:", prediction.shape)
+        st.write("Prediction output:", prediction)
+        
+        # Display results if prediction has the correct shape
+        if prediction.ndim == 2 and prediction.shape[1] == 10:  # Ensure it's a 2D array with 10 outputs
+            st.subheader("Predicted Biocrude Properties:")
+            st.write(f"Biocrude Oil Yield (%): {prediction[0][0]:.2f}")
+            st.write(f"Aqueous Phase Yield (%): {prediction[0][1]:.2f}")
+            st.write(f"Syngas Yield (%): {prediction[0][2]:.2f}")
+            st.write(f"Hydrochar Yield (%): {prediction[0][3]:.2f}")
+            st.write(f"Biocrude Carbon Content (wt%): {prediction[0][4]:.2f}")
+            st.write(f"Biocrude Hydrogen Content (wt%): {prediction[0][5]:.2f}")
+            st.write(f"Biocrude Nitrogen Content (wt%): {prediction[0][6]:.2f}")
+            st.write(f"Biocrude Oxygen Content (wt%): {prediction[0][7]:.2f}")
+            st.write(f"Biocrude Sulfur Content (wt%): {prediction[0][8]:.2f}")
+            st.write(f"Biocrude Calorific Value (MJ/kg): {prediction[0][9]:.2f}")
+        else:
+            st.error("Prediction output has unexpected shape.")
     else:
         st.error("Model is not loaded. Please check the model file.")
