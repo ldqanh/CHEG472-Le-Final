@@ -1,8 +1,6 @@
-import tkinter as tk
-from tkinter import messagebox
-from sklearn.externals import joblib  # To load saved models
+import streamlit as st
 import numpy as np
-import pandas as pd
+import joblib  # To load saved models
 
 # Load your model (assumed to be saved as 'htl_model.pkl')
 def load_model():
@@ -10,20 +8,16 @@ def load_model():
         model = joblib.load('htl_model.pkl')  # Adjust the path if needed
         return model
     except Exception as e:
-        messagebox.showerror("Error", f"Failed to load model: {str(e)}")
+        st.error(f"Failed to load model: {str(e)}")
         return None
 
 # Function to make predictions
-def predict():
+def predict(biomass_input, reaction_input):
     model = load_model()
     if model is None:
-        return
+        return None
     
     try:
-        # Get input data from the user (biomass composition and reaction conditions)
-        biomass_input = [float(entry.get()) for entry in biomass_entries]  # Biomass composition inputs
-        reaction_input = [float(entry.get()) for entry in reaction_entries]  # Reaction condition inputs
-        
         # Combine biomass and reaction condition inputs
         user_input = np.array(biomass_input + reaction_input).reshape(1, -1)  # Reshape for prediction
         
@@ -34,61 +28,36 @@ def predict():
         yield_result = prediction[0][0]  # Adjust indexing depending on your model output
         quality_result = prediction[0][1]  # Adjust indexing depending on your model output
         
-        result_label.config(text=f"Predicted Biocrude Yield: {yield_result:.2f}\nPredicted Biocrude Quality: {quality_result:.2f}")
+        return yield_result, quality_result
     except Exception as e:
-        messagebox.showerror("Error", f"Invalid input: {str(e)}")
+        st.error(f"Invalid input: {str(e)}")
+        return None, None
 
-# GUI Layout
-def create_gui():
-    # Create the root window
-    root = tk.Tk()
-    root.title("HTL Prediction for Biocrude Oil")
+# Streamlit Layout
+def create_streamlit_ui():
+    st.title("HTL Prediction for Biocrude Oil")
 
-    # Labels for Biomass Composition Inputs
-    biomass_labels = ["Moisture (%)", "Protein (%)", "Carbohydrates (%)", "Lipids (%)"]
-    global biomass_entries
-    biomass_entries = []
+    # Biomass Composition Inputs
+    moisture = st.number_input("Moisture (%)", min_value=0.0, max_value=100.0, value=10.0)
+    protein = st.number_input("Protein (%)", min_value=0.0, max_value=100.0, value=10.0)
+    carbohydrates = st.number_input("Carbohydrates (%)", min_value=0.0, max_value=100.0, value=10.0)
+    lipids = st.number_input("Lipids (%)", min_value=0.0, max_value=100.0, value=10.0)
 
-    # Create Entry widgets for biomass composition
-    for label in biomass_labels:
-        frame = tk.Frame(root)
-        frame.pack(pady=5)
+    # Reaction Conditions Inputs
+    temperature = st.number_input("Temperature (°C)", min_value=0.0, max_value=1000.0, value=300.0)
+    pressure = st.number_input("Pressure (MPa)", min_value=0.0, max_value=100.0, value=5.0)
+    reaction_time = st.number_input("Reaction Time (min)", min_value=0.0, max_value=1000.0, value=30.0)
+
+    # Make Prediction Button
+    if st.button("Predict Biocrude Yield and Quality"):
+        biomass_input = [moisture, protein, carbohydrates, lipids]
+        reaction_input = [temperature, pressure, reaction_time]
         
-        label_widget = tk.Label(frame, text=label)
-        label_widget.pack(side=tk.LEFT)
+        yield_result, quality_result = predict(biomass_input, reaction_input)
         
-        entry_widget = tk.Entry(frame)
-        entry_widget.pack(side=tk.LEFT)
-        biomass_entries.append(entry_widget)
+        if yield_result is not None:
+            st.write(f"Predicted Biocrude Yield: {yield_result:.2f}")
+            st.write(f"Predicted Biocrude Quality: {quality_result:.2f}")
 
-    # Labels for Reaction Condition Inputs
-    reaction_labels = ["Temperature (°C)", "Pressure (MPa)", "Reaction Time (min)"]
-    global reaction_entries
-    reaction_entries = []
-
-    # Create Entry widgets for reaction conditions
-    for label in reaction_labels:
-        frame = tk.Frame(root)
-        frame.pack(pady=5)
-        
-        label_widget = tk.Label(frame, text=label)
-        label_widget.pack(side=tk.LEFT)
-        
-        entry_widget = tk.Entry(frame)
-        entry_widget.pack(side=tk.LEFT)
-        reaction_entries.append(entry_widget)
-
-    # Create a button to make predictions
-    predict_button = tk.Button(root, text="Predict Biocrude Yield and Quality", command=predict)
-    predict_button.pack(pady=10)
-    
-    # Label to display the result
-    global result_label
-    result_label = tk.Label(root, text="Predicted Biocrude Yield and Quality: N/A")
-    result_label.pack(pady=20)
-    
-    # Run the GUI loop
-    root.mainloop()
-
-# Start the GUI
-create_gui()
+# Run the Streamlit app
+create_streamlit_ui()
